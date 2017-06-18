@@ -57,7 +57,7 @@ io.get('/a/x').then(function (value) {
 
 // set up a redirect /b => /a/b
 io.mock('/b', function (options) {
-  return heya.io.get('/a/b', options.query || options.data || null);
+  return io.get('/a/b', options.query || options.data || null);
 });
 
 // let's make another call
