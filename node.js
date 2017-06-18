@@ -1,6 +1,6 @@
 'use strict';
 
-var io = require('heya-io');
+var io = require('heya-io/io');
 var FauxXHR = require('heya-io/FauxXHR');
 
 var request = require('request');
@@ -43,8 +43,7 @@ function makeHeaders (rawHeaders, mime) {
 var isJson = /^application\/json\b/;
 
 function requestTransport (options, prep) {
-	var headers = new Headers(options.headers || {}),
-		req = {
+	var req = {
 			url: prep.url,
 			method: options.method,
 			headers: options.headers ? Object.create(options.headers) : {}
@@ -61,8 +60,9 @@ function requestTransport (options, prep) {
 			headers: makeHeaders(head.rawHeaders, options.mime),
 			responseType: options.responseType || '',
 			responseText: response[1].toString()
-		}));
+		}), options);
 	});
+}
 
 io.node = {
 	attach: attach,
@@ -72,16 +72,16 @@ io.node = {
 var oldTransport;
 
 function attach () {
-	if (io.defaultTransport !== fetchTransport) {
+	if (io.defaultTransport !== requestTransport) {
 		oldTransport = io.defaultTransport;
-		io.defaultTransport = fetchTransport;
+		io.defaultTransport = requestTransport;
 		return true;
 	}
 	return false;
 }
 
 function detach () {
-	if (oldTransport && io.defaultTransport === fetchTransport) {
+	if (oldTransport && io.defaultTransport === requestTransport) {
 		io.defaultTransport = oldTransport;
 		oldTransport = null;
 		return true;
