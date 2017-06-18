@@ -1,0 +1,37 @@
+{
+  "name": "heya-io-node",
+  "version": "1.0.0",
+  "description": "Intelligent I/O for Node",
+  "main": "main.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "node tests/tests.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/heya/io-node.git"
+  },
+  "keywords": [
+    "I/O",
+    "XHR",
+    "IO"
+  ],
+  "author": "Eugene Lazutkin <eugene.lazutkin@gmail.com> (http://www.lazutkin.com/)",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/heya/io-node/issues"
+  },
+  "homepage": "https://github.com/heya/io-node#readme",
+  "devDependencies": {
+    "body-parser": "^1.15.0",
+    "express": "^4.13.4",
+    "heya-bundler": "^1.0.2",
+    "heya-unit": "^0.3.0",
+    "request": "^2.71.0"
+  },
+  "dependencies": {
+    "heya-io": "^1.1.1"
+  }
+}
