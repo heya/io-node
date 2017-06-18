@@ -78,18 +78,12 @@ io.get(url`/api/${client}/details`).then(function (value) {
 });
 ```
 
-See more examples in the cookbooks of `heya-io`:
+See more examples in [heya-io's Wiki](https://github.com/heya/io/wiki/) and the cookbooks of `heya-io`:
 
 * [Cookbook: main](https://github.com/heya/io/wiki/Cookbook:-main)
 * Services:
-  * [Cookbook: bundle](https://github.com/heya/io/wiki/Cookbook:-bundle)
-  * [Cookbook: cache](https://github.com/heya/io/wiki/Cookbook:-cache)
   * [Cookbook: mock](https://github.com/heya/io/wiki/Cookbook:-mock)
   * [Cookbook: track](https://github.com/heya/io/wiki/Cookbook:-track)
-* Transports:
-  * [Cookbook: jsonp](https://github.com/heya/io/wiki/Cookbook:-jsonp)
-  * [Cookbook: load](https://github.com/heya/io/wiki/Cookbook:-load)
-  * [Cookbook: fetch](https://github.com/heya/io/wiki/Cookbook:-fetch)
 
 # How to install
 
@@ -107,7 +101,7 @@ All documentation can be found in [project's wiki](https://github.com/heya/io-no
 
 # Versions
 
-- 1.0.0 &mdash; *The initial release as heya-io.*
+- 1.0.0 &mdash; *The initial release.*
 
 # License
 
