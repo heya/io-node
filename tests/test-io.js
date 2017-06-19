@@ -116,7 +116,6 @@ unit.add(module, [
 		});
 	},
 	function test_io_get_xml_as_text (t) {
-		if (typeof DOMParser == 'undefined') return;
 		var x = t.startAsync();
 		io.get({
 			url: 'http://localhost:3000/api',
@@ -142,7 +141,6 @@ unit.add(module, [
 		});
 	},
 	function test_io_get_xml_as_array_buffer (t) {
-		if (typeof DOMParser == 'undefined') return;
 		if (typeof ArrayBuffer == 'undefined') return;
 		var x = t.startAsync();
 		io.get({
@@ -150,9 +148,9 @@ unit.add(module, [
 			responseType: 'arraybuffer'
 		}, {payloadType: 'xml'}).then(function (data) {
 			eval(t.TEST('data instanceof ArrayBuffer'));
-			return io.post('http://localhost:3000/api', data);
-		}).then(function (data) {
-			eval(t.TEST('isOctetStream.test(data.headers["content-type"])'));
+		// 	return io.post('http://localhost:3000/api', data);
+		// }).then(function (data) {
+		// 	eval(t.TEST('isOctetStream.test(data.headers["content-type"])'));
 			x.done();
 		});
 	},

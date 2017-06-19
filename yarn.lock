@@ -272,9 +272,9 @@ heya-ice@>=0.1:
   version "0.1.11"
   resolved "https://registry.yarnpkg.com/heya-ice/-/heya-ice-0.1.11.tgz#5d6da59c60b59c7023a83470fb6e9771d7705849"
 
-heya-io@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/heya-io/-/heya-io-1.1.1.tgz#3831a641d7a715ded2c71e491280ec8ee61c7f55"
+heya-io@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/heya-io/-/heya-io-1.1.2.tgz#cc5c227bc13ece226567c662a9628ef7bb3f2431"
 
 heya-unify@>=0.2:
   version "0.2.5"
