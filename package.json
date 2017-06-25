@@ -29,10 +29,10 @@
     "express": "^4.13.4",
     "heya-async": "^1.0.1",
     "heya-bundler": "^1.0.2",
-    "heya-unit": "^0.3.0",
-    "request": "^2.71.0"
+    "heya-unit": "^0.3.0"
   },
   "dependencies": {
-    "heya-io": "^1.1.4"
+    "heya-io": "^1.1.4",
+    "request": "^2.71.0"
   }
 }
