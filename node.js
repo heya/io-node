@@ -52,21 +52,36 @@ function requestTransport (options, prep) {
 	req.body = io.processData({setRequestHeader: function (key, value) {
 		req.headers[key] = value;
 	}}, options, prep.data);
-	return requestAsync(req).then(function (response) {
+	if (req.body && typeof req.body == 'object') {
+		var bodyProcessors = io.node.bodyProcessors;
+		for (var i = 0; i < bodyProcessors.length; i += 2) {
+			if(req.body instanceof bodyProcessors[i]) {
+				bodyProcessors[i + 1](req, options, prep);
+				break;
+			}
+		}
+	}
+	// console.log('REQ', req);
+	return requestAsync(io.node.inspectRequest(req)).then(function (response) {
 		var head  = response[0];
-		return new io.Result(new FauxXHR({
+		return io.node.inspectResult(new io.Result(new FauxXHR({
 			status: head.statusCode,
 			statusText: head.statusMessage,
 			headers: makeHeaders(head.rawHeaders, options.mime),
 			responseType: options.responseType || '',
 			responseText: response[1].toString()
-		}), options);
+		}), options));
 	});
 }
 
+function identity (x) { return x; }
+
 io.node = {
 	attach: attach,
-	detach: detach
+	detach: detach,
+	inspectRequest: identity,
+	inspectResult:  identity,
+	bodyProcessors: []
 };
 
 var oldTransport;
