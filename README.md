@@ -101,6 +101,8 @@ All documentation can be found in [project's wiki](https://github.com/heya/io-no
 
 # Versions
 
+- 1.0.2 &mdash; *Added custom body processors.*
+- 1.0.1 &mdash; *New dependencies.*
 - 1.0.0 &mdash; *The initial release.*
 
 # License
