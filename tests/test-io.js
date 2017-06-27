@@ -165,5 +165,23 @@ unit.add(module, [
 			eval(t.TEST('isMultiPart.test(data.headers["content-type"])'));
 			x.done();
 		});
+	},
+	function test_io_custom_headers(t){
+		var x = t.startAsync();
+		io({
+			url:'http://localhost:3000/api',
+			headers: {
+				'Accept':'text/mod+plain',
+				'Content-Type':'text/plain'
+			},
+			method: 'POST',
+			data: 'Some Text'
+		}).then(function (data) {
+			eval(t.TEST('data.method === "POST"'));
+			eval(t.TEST('data.body === "Some Text"'));
+			eval(t.TEST('data.headers["content-type"] === "text/plain"'));
+			eval(t.TEST('data.headers["accept"] === "text/mod+plain"'));
+			x.done();
+		});
 	}
 ]);

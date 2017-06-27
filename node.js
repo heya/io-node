@@ -46,7 +46,7 @@ function requestTransport (options, prep) {
 	var req = {
 			url: prep.url,
 			method: options.method,
-			headers: options.headers ? Object.create(options.headers) : {}
+			headers: Object.assign({}, options.headers)
 		};
 	if (options.timeout) req.timeout = options.timeout;
 	req.body = io.processData({setRequestHeader: function (key, value) {
