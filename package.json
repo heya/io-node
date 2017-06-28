@@ -1,6 +1,6 @@
 {
   "name": "heya-io-node",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Intelligent I/O for Node",
   "main": "main.js",
   "directories": {
@@ -32,7 +32,7 @@
     "heya-unit": "^0.3.0"
   },
   "dependencies": {
-    "heya-io": "^1.1.4",
+    "heya-io": "^1.1.5",
     "request": "^2.71.0"
   }
 }
