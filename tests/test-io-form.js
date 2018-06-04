@@ -20,7 +20,7 @@ unit.add(module, [
 		var x = t.startAsync();
 		var data = new FormData({
 				user: 'heh!',
-				buffer: new Buffer(10)
+				buffer: Buffer.alloc(10)
 			});
 		io.post({
 			url: 'http://localhost:3000/api',

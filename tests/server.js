@@ -5,16 +5,45 @@ var path = require('path');
 var debug = require('debug')('heya-io:server');
 var express = require('express');
 var bodyParser = require('body-parser');
+var compression = require('compression');
 
 var bundler = require('heya-bundler');
 
 // The APP
 
 var app = express();
-
 app.use(bodyParser.raw({type: '*/*'}));
+app.use(compression());
 
 var counter = 0;
+
+var alphabet = 'abcdefghijklmnopqrstuvwxyz';
+
+app.get('/alpha', function (req, res) {
+	var n;
+	if (req.query.n) {
+		n = +req.query.n;
+		if (isNaN(n)) {
+			n = 100;
+		}
+		n = Math.min(1000, Math.max(n, 1));
+	}
+	res.set('Content-Type', 'text/plain');
+	for (var i = 0; i < n; ++i) {
+		res.write(alphabet);
+	}
+	res.end();
+});
+app.post('/alpha', function (req, res) {
+	var body = req.body.toString(), n = body.length, verified = true;
+	for (var i = 0; i < n; i += 26) {
+		if (body.substr(i, 26) !== alphabet) {
+			verified = false;
+			break;
+		}
+	}
+	res.jsonp({n: n, verified: verified});
+});
 
 app.all('/api', function (req, res) {
 	if (req.query.status) {
