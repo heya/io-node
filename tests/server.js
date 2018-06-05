@@ -12,14 +12,14 @@ var bundler = require('heya-bundler');
 // The APP
 
 var app = express();
-app.use(bodyParser.raw({type: '*/*'}));
 app.use(compression());
+app.use(bodyParser.raw({type: '*/*'}));
 
 var counter = 0;
 
 var alphabet = 'abcdefghijklmnopqrstuvwxyz';
 
-app.get('/alpha', function (req, res) {
+app.get('/alpha', function(req, res) {
 	var n;
 	if (req.query.n) {
 		n = +req.query.n;
@@ -34,8 +34,10 @@ app.get('/alpha', function (req, res) {
 	}
 	res.end();
 });
-app.post('/alpha', function (req, res) {
-	var body = req.body.toString(), n = body.length, verified = true;
+app.post('/alpha', function(req, res) {
+	var body = req.body.toString(),
+		n = body.length,
+		verified = true;
 	for (var i = 0; i < n; i += 26) {
 		if (body.substr(i, 26) !== alphabet) {
 			verified = false;
@@ -45,7 +47,7 @@ app.post('/alpha', function (req, res) {
 	res.jsonp({n: n, verified: verified});
 });
 
-app.all('/api', function (req, res) {
+app.all('/api', function(req, res) {
 	if (req.query.status) {
 		var status = parseInt(req.query.status, 10);
 		if (isNaN(status) || status < 100 || status >= 600) {
@@ -64,17 +66,17 @@ app.all('/api', function (req, res) {
 			return;
 	}
 	var data = {
-			method: req.method,
-			protocol: req.protocol,
-			hostname: req.hostname,
-			url: req.url,
-			originalUrl: req.originalUrl,
-			headers: req.headers,
-			body: req.body && req.body.length && req.body.toString() || null,
-			query: req.query,
-			now: Date.now(),
-			counter: counter++
-		};
+		method: req.method,
+		protocol: req.protocol,
+		hostname: req.hostname,
+		url: req.url,
+		originalUrl: req.originalUrl,
+		headers: req.headers,
+		body: (req.body && req.body.length && req.body.toString()) || null,
+		query: req.query,
+		now: Date.now(),
+		counter: counter++
+	};
 	var timeout = 0;
 	if (req.query.timeout) {
 		var timeout = parseInt(req.query.timeout, 10);
@@ -83,7 +85,7 @@ app.all('/api', function (req, res) {
 		}
 	}
 	if (timeout) {
-		setTimeout(function () {
+		setTimeout(function() {
 			res.jsonp(data);
 		}, timeout);
 	} else {
@@ -91,17 +93,23 @@ app.all('/api', function (req, res) {
 	}
 });
 
-app.put('/bundle', bundler({
-	isUrlAcceptable: isUrlAcceptable,
-	resolveUrl: resolveUrl
-}));
+app.put(
+	'/bundle',
+	bundler({
+		isUrlAcceptable: isUrlAcceptable,
+		resolveUrl: resolveUrl
+	})
+);
 
-function isUrlAcceptable (uri) {
-	return typeof uri == 'string' && !/^\/\//.test(uri) &&
-		(uri.charAt(0) === '/' || /^http:\/\/localhost:3000\//.test(uri));
+function isUrlAcceptable(uri) {
+	return (
+		typeof uri == 'string' &&
+		!/^\/\//.test(uri) &&
+		(uri.charAt(0) === '/' || /^http:\/\/localhost:3000\//.test(uri))
+	);
 }
 
-function resolveUrl (uri) {
+function resolveUrl(uri) {
 	return uri.charAt(0) === '/' ? 'http://localhost:3000' + uri : uri;
 }
 
@@ -172,10 +180,9 @@ function normalizePort(val) {
  * Human-readable port description.
  */
 
-function portToString (port) {
+function portToString(port) {
 	return typeof port === 'string' ? 'pipe ' + port : 'port ' + port;
 }
-
 
 /**
  * Event listener for HTTP server "error" event.

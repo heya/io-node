@@ -45,9 +45,19 @@ unit.add(module, [
 			eval(t.TEST('data.n === 2600'));
 			eval(t.TEST('data.verified'));
 			x.done();
-		}).catch(e => {
-			console.error(e);
-			t.test(false);
+		});
+	},
+	function test_compression_force (t) {
+		const x = t.startAsync();
+		io.post({
+			url: 'http://localhost:3000/alpha',
+			headers: {
+				'Content-Type': 'plain/text',
+				'Content-Encoding': 'gzip'
+			}
+		}, rep(alphabet, 100)).then(data => {
+			eval(t.TEST('data.n === 2600'));
+			eval(t.TEST('data.verified'));
 			x.done();
 		});
 	}

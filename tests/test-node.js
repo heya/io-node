@@ -40,5 +40,22 @@ unit.add(module, [
 			x.done();
 		});
 		dataStream.end(JSON.stringify({a: 1}));
+	},
+	function test_node_forceCompression (t) {
+		if (!PassThrough) return;
+		const x = t.startAsync(), dataStream = new PassThrough();
+		io.post({
+			url: 'http://localhost:3000/alpha',
+			headers: {
+				'Content-Type': 'plain/text',
+				'Content-Encoding': 'gzip'
+			}
+		}, dataStream).then(data => {
+			eval(t.TEST('data.n === 2626'));
+			eval(t.TEST('data.verified'));
+			x.done();
+		});
+		for (let i = 0; i < 100; ++i) dataStream.write(alphabet);
+		dataStream.end(alphabet);
 	}
 ]);
