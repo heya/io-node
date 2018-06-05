@@ -63,10 +63,6 @@ unit.add(module, [
 			eval(t.TEST('data.method === "DELETE"'));
 			eval(t.TEST('data.body === null'));
 			x.done();
-		}).catch(e => {
-			console.error(e);
-			t.test(false);
-			x.done();
 		});
 	},
 	function test_io_get_query (t) {
