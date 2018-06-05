@@ -7,6 +7,7 @@ require('./test-mock');
 require('./test-url');
 require('./test-compression');
 require('./test-node');
+require('./test-stream');
 
 var unit = require('heya-unit');
 
