@@ -4,6 +4,7 @@ const url = require('url');
 const http = require('http');
 const https = require('https');
 const zlib = require('zlib');
+const {Readable} = require('stream');
 
 const io = require('heya-io/io');
 const FauxXHR = require('heya-io/FauxXHR');
@@ -18,10 +19,10 @@ const makeHeaders = (rawHeaders, mime) => {
 	return rawHeaders.reduce((acc, value, index) => acc + (index % 2 ? ': ' : (index ? '\r\n' : '')) + value, '');
 }
 
-const returnDataStream = res => {
+const returnDataStream = (res, options) => {
 	const encoding = res.headers['content-encoding'] || res.headers['Content-Encoding'];
-	const decompressor = encoding && io.node.decompressors[encoding];
-	return decompressor ? res.pipe(decompressor.stream()) : res;
+	const compressor = encoding && io.node.compressors[encoding];
+	return compressor ? res.pipe(compressor.decompress(options)) : res;
 };
 
 const isJson = /^application\/json\b/;
@@ -50,7 +51,7 @@ const requestTransport = (options, prep) => {
 	// create Accept-Encoding
 	delete newOptions.headers['Accept-Encoding'];
 	delete newOptions.headers['accept-encoding'];
-	const decompressorOptions = Object.keys(io.node.decompressors).sort((a, b) => io.node.decompressors[a].priority - io.node.decompressors[b].priority);
+	const decompressorOptions = Object.keys(io.node.compressors).sort((a, b) => io.node.compressors[a].priority - io.node.compressors[b].priority);
 	if (decompressorOptions.length) {
 		newOptions.headers['Accept-Encoding'] = decompressorOptions.join(', ');
 	}
@@ -74,7 +75,11 @@ const requestTransport = (options, prep) => {
 		const proto = options.protocol && options.protocol.toLowerCase() === 'https:' ? https : http;
 		const req = proto.request(options, res => resolve(res));
 		req.on('error', e => reject(e));
-		req.end(options.body);
+		if (options.body instanceof Readable) {
+			options.body.pipe(req);
+		} else {
+			req.end(options.body);
+		}
 	}).then(res => {
 		if (options.responseType === '$tream') {
 			const xhr = new FauxXHR({
@@ -84,11 +89,11 @@ const requestTransport = (options, prep) => {
 				responseType: options.responseType || '',
 				responseText: ''
 			});
-			xhr.response = returnDataStream(res);
+			xhr.response = returnDataStream(res, options);
 			return xhr;
 		}
 		return new Promise(resolve => {
-			const dataStream = returnDataStream(res);
+			const dataStream = returnDataStream(res, options);
 			let buffer = null;
 			dataStream.on('data', chunk => (buffer === null ? (buffer = chunk) : (buffer += chunk)));
 			dataStream.on('end', () => resolve(buffer));
@@ -132,9 +137,10 @@ io.node = {
 	inspectRequest: identity,
 	inspectResult:  identity,
 	bodyProcessors: [],
-	decompressors: {
-		gzip:    {priority: 10, stream: () => zlib.createGunzip()},
-		deflate: {priority: 20, stream: () => zlib.createInflate()}
+	compressionLimit: 1024,
+	compressors: {
+		gzip:    {priority: 10, compress: options => zlib.createGzip(options && options.compressor),    decompress: options => zlib.createGunzip(options && options.decompressor)},
+		deflate: {priority: 20, compress: options => zlib.createDeflate(options && options.compressor), decompress: options => zlib.createInflate(options && options.decompressor)}
 	}
 };
 
