@@ -5,20 +5,29 @@
 [![devDependencies][dev-deps-image]][dev-deps-url]
 [![NPM version][npm-image]][npm-url]
 
-This is a Node-specific transport for [heya-io](https://github.com/heya/io) based on venerable [request](https://www.npmjs.com/package/request), and an adapter, which sets things right to work on Node. The main purpose of the module is to provide a robust foundation to run `heya-io`-based unit tests on Node, and to write an isomorphic JavaScript code. But it can be used to simplify I/O on Node, and to use enhanced features of `heya-io` in the server environment.
+This is a Node-specific transport for [heya-io](https://github.com/heya/io) based on built-in `http` and `https` modules. The main purpose of the module is to provide an ergonomic simple light-weight HTTP I/O on Node leveraging existing customization facilities of `heya-io` where appropriate.
 
-Presently following `heya-io` services are supported as is:
+Following `heya-io` services are supported as is out of the box:
 
 * `io.track` &mdash; a simple plugin to track I/O requests to eliminate duplicates, register an interest without initiating I/O requests, and much more.
 * `io.mock` &mdash; a way to mock I/O requests without writing a special server courtesy of [Mike Wilcox](https://github.com/clubajax). Very useful for rapid prototyping and writing tests.
 * `io.bust` &mdash; a simple plugin to generate a randomized query value to bust cache.
+
+Additionally it supports:
+
+* Completely transparent compression/decompression.
+  * `gzip` and `deflate` are supported out of the box with no extra dependencies using built-in modules.
+  * More compressions, like [brotli](https://en.wikipedia.org/wiki/Brotli) can be easily plugged in.
+  * The compression is supported **both ways**.
+* Streaming.
+  * Both streaming a server request and a server response are supported.
 
 # Examples
 
 Plain vanilla GET:
 
 ```js
-var io = require('heya-io-node');
+const io = require('heya-io-node');
 
 io.get('http://example.com/hello').then(function (value) {
   console.log(value);
@@ -41,7 +50,36 @@ io.patch('/things/7', {age: 14}).then(done);
 io.remove('/things/3').then(done);
 ```
 
-Mock:
+Streaming (since 1.1.0):
+
+```js
+const ios = require('heya-io-node/stream');
+fs.createReadStream('sample.json')
+  .pipe(ios.post({
+    url: 'https://example.com/analyze',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Encoding': 'gzip',
+      'Accept: plain/text'
+    }
+  }))
+  .pipe(process.stdout);
+
+// or it can be done more granularly:
+
+io.post({
+  url: 'https://example.com/analyze',
+  headers: {
+    'Content-Type': 'application/json',
+    'Content-Encoding': 'gzip',
+    'Accept: plain/text'
+  },
+  responseType: '$tream'
+}, fs.createReadStream('sample.json'))
+  .then(res => res.pipe(process.stdout));
+```
+
+Mock in action:
 
 ```js
 // set up a mock handler
@@ -78,7 +116,7 @@ io.get(url`/api/${client}/details`).then(function (value) {
 });
 ```
 
-See more examples in [heya-io's Wiki](https://github.com/heya/io/wiki/) and the cookbooks of `heya-io`:
+See more examples in [heya-io's Wiki](https://github.com/heya/io/wiki/), [heya-io-node's Wiki](https://github.com/heya/io-node/wiki/), and the cookbooks of `heya-io`:
 
 * [Cookbook: main](https://github.com/heya/io/wiki/Cookbook:-main)
 * Services:
@@ -98,6 +136,7 @@ All documentation can be found in [project's wiki](https://github.com/heya/io-no
 
 # Versions
 
+- 1.1.0 &mdash; *Getting rid of `request`, use native `http`/`https`, support compression and streaming.*
 - 1.0.3 &mdash; *Bugfix: custom headers. Thx [Bryan Pease](https://github.com/Akeron972)!*
 - 1.0.2 &mdash; *Added custom body processors.*
 - 1.0.1 &mdash; *New dependencies.*
