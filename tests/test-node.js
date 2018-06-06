@@ -57,5 +57,19 @@ unit.add(module, [
 		});
 		for (let i = 0; i < 100; ++i) dataStream.write(alphabet);
 		dataStream.end(alphabet);
+	},
+	function test_node_buffer(t) {
+		const x = t.startAsync();
+		io.post({
+			url: 'http://localhost:3000/api',
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		}, Buffer.from(JSON.stringify({a: 1}))).then(data => {
+			eval(t.TEST('data.method === "POST"'));
+			eval(t.TEST('data.headers["content-type"] === "application/json"'));
+			eval(t.TEST('data.body === "{\\"a\\":1}"'));
+			x.done();
+		});
 	}
 ]);

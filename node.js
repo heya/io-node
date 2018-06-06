@@ -21,11 +21,7 @@ const makeHeaders = (rawHeaders, mime) => {
 
 const returnOutputStream = (res, options) => {
 	const encoding = res.headers['content-encoding'];
-	const decoder =
-		encoding &&
-		io.node.encoders[encoding] &&
-		io.node.encoders[encoding].decode &&
-		io.node.encoders[encoding].decode(options);
+	const decoder = encoding && io.node.encoders[encoding] && io.node.encoders[encoding].decode && io.node.encoders[encoding].decode(options);
 	return decoder ? res.pipe(decoder) : res;
 };
 
@@ -35,12 +31,7 @@ const returnInputStream = (req, options) => {
 		encoding = io.node.preferredEncoding;
 		req.setHeader('content-encoding', encoding);
 	}
-	const encoder =
-		encoding &&
-		io.node.encoders[encoding] &&
-		io.node.encoders[encoding].encode &&
-		io.node.encoders[encoding].encode(options);
-	const stream = encoder ? (encoder.pipe(req), encoder) : req;
+	const stream = io.node.encoders[encoding].encode(options).pipe(req);
 	if (stream === req) req.removeHeader('content-encoding');
 	return stream;
 };
@@ -68,8 +59,9 @@ const requestTransport = (options, prep) => {
 	if (options.timeout) newOptions.timeout = options.timeout;
 
 	// create Accept-Encoding
-	delete newOptions.headers['Accept-Encoding'];
-	delete newOptions.headers['accept-encoding'];
+	Object.keys(newOptions.headers)
+		.filter(key => /^Accept\-Encoding$/i.test(key))
+		.forEach(key => delete newOptions.headers[key]);
 	if (io.node.acceptedEncoding) {
 		newOptions.headers['Accept-Encoding'] = io.node.acceptedEncoding;
 	}
@@ -86,25 +78,21 @@ const requestTransport = (options, prep) => {
 	);
 
 	return new Promise((resolve, reject) => {
-		const options = io.node.inspectRequest(newOptions);
-		const proto = options.protocol && options.protocol.toLowerCase() === 'https:' ? https : http;
-		const req = proto.request(options, res => resolve(res));
+		const opt = io.node.inspectRequest(newOptions);
+		const proto = opt.protocol && opt.protocol.toLowerCase() === 'https:' ? https : http;
+		const req = proto.request(opt, res => resolve(res));
 		req.on('error', e => reject(e));
-		if (options.body instanceof Readable) {
-			const stream =
-				req.getHeader('content-type') && req.getHeader('content-encoding')
-					? returnInputStream(req, options)
-					: req;
-			options.body.pipe(stream);
+		if (opt.body instanceof Readable) {
+			const stream = req.getHeader('content-type') && req.getHeader('content-encoding') ? returnInputStream(req, opt) : req;
+			opt.body.pipe(stream);
 		} else {
 			const stream =
-				options.body &&
+				opt.body &&
 				req.getHeader('content-type') &&
-				((io.node.encodingThreshold && options.body.length > io.node.encodingThreshold) ||
-					req.getHeader('content-encoding'))
-					? returnInputStream(req, options)
+				((io.node.encodingThreshold && opt.body.length > io.node.encodingThreshold) || req.getHeader('content-encoding'))
+					? returnInputStream(req, opt)
 					: req;
-			stream.end(options.body);
+			stream.end(opt.body);
 		}
 	})
 		.then(res => {
