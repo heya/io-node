@@ -10,6 +10,7 @@ const requestHasNoBody = {GET: 1, HEAD: 1, OPTIONS: 1, DELETE: 1},
 class IO extends Duplex {
 	constructor(options, streamOptions) {
 		super(streamOptions);
+		this.meta = null;
 
 		if (typeof options == 'string') {
 			options = {url: options, method: 'GET'};
@@ -18,6 +19,7 @@ class IO extends Duplex {
 			options.method = (options.method && options.method.toUpperCase()) || 'GET';
 		}
 		options.responseType = '$tream';
+		options.returnXHR = true;
 
 		if (requestHasNoBody[options.method] === 1 || 'data' in options) {
 			this._write = (_1, _2, callback) => callback(null);
@@ -28,8 +30,9 @@ class IO extends Duplex {
 		}
 
 		io(options)
-			.then(res => {
-				this.output = res;
+			.then(xhr => {
+				this.meta = xhr;
+				this.output = xhr.response;
 				this.output.on('data', chunk => !this.push(chunk) && this.output.pause());
 				this.output.on('end', () => this.push(null));
 				if (responseHasNoBody[options.method] === 1) {
