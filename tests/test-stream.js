@@ -5,6 +5,7 @@ const {Readable, Writable} = require('stream');
 const unit = require('heya-unit');
 const ios = require('../stream');
 
+const isJson = /^application\/json\b/;
 // const isXml = /^application\/xml\b/;
 
 class Collector extends Writable {
@@ -223,8 +224,8 @@ unit.add(module, [
 		);
 	},
 	function test_stream_custom_headers(t) {
-		var x = t.startAsync();
-		new ios.IO({
+		const x = t.startAsync();
+		const net = new ios.IO({
 			url: 'http://localhost:3000/api',
 			headers: {
 				Accept: 'text/mod+plain',
@@ -232,12 +233,19 @@ unit.add(module, [
 			},
 			method: 'POST',
 			data: 'Some Text'
-		}).pipe(
+		});
+		net.pipe(
 			collectJson(data => {
 				eval(t.TEST('data.method === "POST"'));
 				eval(t.TEST('data.body === "Some Text"'));
 				eval(t.TEST('data.headers["content-type"] === "text/plain"'));
 				eval(t.TEST('data.headers["accept"] === "text/mod+plain"'));
+
+				eval(t.TEST('net.meta.status == 200'));
+
+				const headers = net.getHeaders();
+				eval(t.TEST('isJson.test(headers["content-type"])'));
+
 				x.done();
 			})
 		);

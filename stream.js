@@ -41,6 +41,12 @@ class IO extends Duplex {
 			})
 			.catch(e => this.emit('error', e));
 	}
+	getData() {
+		return io.getData(this.meta);
+	}
+	getHeaders() {
+		return io.getHeaders(this.meta);
+	}
 	_write(chunk, encoding, callback) {
 		let error = null;
 		try {

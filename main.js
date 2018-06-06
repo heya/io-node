@@ -14,19 +14,25 @@ class FailedIO extends Error {
 		this.options = options;
 		this.event = event;
 	}
-};
+	getData() {
+		return io.getData(this.xhr);
+	}
+	getHeaders() {
+		return io.getHeaders(this.xhr);
+	}
+}
 io.FailedIO = FailedIO;
 class TimedOut extends FailedIO {
 	constructor(xhr, options, event) {
 		super(xhr, options, event, 'Timed out I/O');
 	}
-};
+}
 io.TimedOut = TimedOut;
 class BadStatus extends FailedIO {
 	constructor(xhr, options, event) {
 		super(xhr, options, event, 'Bad status I/O' + (xhr && xhr.status ? ': ' + xhr.status : ''));
 	}
-};
+}
 io.BadStatus = BadStatus;
 
 io.node.attach();

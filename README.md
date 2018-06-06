@@ -152,6 +152,8 @@ The server runs indefinitely, and can be stopped by Ctrl+C.
 
 # Versions
 
+- 1.1.2 &mdash; *Exposed `getData()` and `getHeaders()` on stream and error objects.*
+- 1.1.1 &mdash; *Added support for `Buffer`, replaced failure objects with `Error`-based objects.*
 - 1.1.0 &mdash; *Getting rid of `request`, use native `http`/`https`, support compression and streaming.*
 - 1.0.3 &mdash; *Bugfix: custom headers. Thx [Bryan Pease](https://github.com/Akeron972)!*
 - 1.0.2 &mdash; *Added custom body processors.*

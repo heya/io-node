@@ -3,7 +3,8 @@
 var unit = require('heya-unit');
 var io   = require('../main');
 
-var isXml = /^application\/xml\b/,
+var isJson = /^application\/json\b/,
+	isXml = /^application\/xml\b/,
 	isOctetStream = /^application\/octet-stream\b/,
 	isMultiPart = /^multipart\/form-data\b/;
 
@@ -181,6 +182,19 @@ unit.add(module, [
 			eval(t.TEST('data.body === "Some Text"'));
 			eval(t.TEST('data.headers["content-type"] === "text/plain"'));
 			eval(t.TEST('data.headers["accept"] === "text/mod+plain"'));
+			x.done();
+		});
+	},
+	function test_io_get_as_xhr (t) {
+		var x = t.startAsync();
+		io.get({
+			url: 'http://localhost:3000/api',
+			returnXHR: true
+		}).then(function (xhr) {
+			var data = io.getData(xhr), headers = io.getHeaders(xhr);
+			eval(t.TEST('xhr.status == 200'));
+			eval(t.TEST('typeof data == "object"'));
+			eval(t.TEST('isJson.test(headers["content-type"])'));
 			x.done();
 		});
 	}
