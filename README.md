@@ -134,6 +134,22 @@ npm install --save heya-io-node
 
 All documentation can be found in [project's wiki](https://github.com/heya/io-node/wiki).
 
+# Working on this project
+
+In order to run tests locally, you should start the test server first:
+
+```bash
+npm start
+```
+
+Then (likely in a different command line window) run tests:
+
+```bash
+npm test
+```
+
+The server runs indefinitely, and can be stopped by Ctrl+C.
+
 # Versions
 
 - 1.1.0 &mdash; *Getting rid of `request`, use native `http`/`https`, support compression and streaming.*
