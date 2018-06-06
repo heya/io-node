@@ -21,9 +21,10 @@ class IO extends Duplex {
 
 		if (requestHasNoBody[options.method] === 1 || 'data' in options) {
 			this._write = (_1, _2, callback) => callback(null);
-			this._final = callback => callback(null);
+			// this._final = callback => callback(null); // unavailable in Node 6
 		} else {
 			this.input = options.data = new PassThrough();
+			this.on('finish', () => this.input.end(null, null)); // for Node 6
 		}
 
 		io(options)
@@ -45,14 +46,14 @@ class IO extends Duplex {
 			error = e;
 		}
 	}
-	_final(callback) {
-		let error = null;
-		try {
-			this.input.end(null, null, e => callback(e || error));
-		} catch (e) {
-			error = e;
-		}
-	}
+	// _final(callback) { // unavailable in Node 6
+	// 	let error = null;
+	// 	try {
+	// 		this.input.end(null, null, e => callback(e || error));
+	// 	} catch (e) {
+	// 		error = e;
+	// 	}
+	// }
 	_read() {
 		this.output && this.output.resume();
 	}

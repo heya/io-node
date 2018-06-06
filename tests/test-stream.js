@@ -5,15 +5,14 @@ const {Readable, Writable} = require('stream');
 const unit = require('heya-unit');
 const ios = require('../stream');
 
-const isXml = /^application\/xml\b/,
-	isOctetStream = /^application\/octet-stream\b/,
-	isMultiPart = /^multipart\/form-data\b/;
+// const isXml = /^application\/xml\b/;
 
 class Collector extends Writable {
 	constructor(cb) {
 		super();
 		this.cb = cb;
 		this.buffer = null;
+		this.on('finish', () => this.cb(this.buffer)); // for Node 6
 	}
 	_write(chunk, encoding, callback) {
 		if (this.buffer === null) {
@@ -23,10 +22,10 @@ class Collector extends Writable {
 		}
 		callback(null);
 	}
-	_final(callback) {
-		this.cb(this.buffer);
-		callback(null);
-	}
+	// _final(callback) { // unavailable in Node 6
+	// 	this.cb(this.buffer);
+	// 	callback(null);
+	// }
 }
 
 const collect = cb => new Collector(cb);
@@ -81,8 +80,7 @@ unit.add(module, [
 	function test_stream_io2(t) {
 		const x = t.startAsync();
 		new ios.IO('http://localhost:3000/api').pipe(
-			collect(buffer => {
-				const data = JSON.parse(buffer.toString());
+			collectJson(data => {
 				eval(t.TEST('data.method === "GET"'));
 				eval(t.TEST('data.body === null'));
 				x.done();
