@@ -1,23 +1,43 @@
 'use strict';
 
-var http = require('http');
-var path = require('path');
-var debug = require('debug')('heya-io:server');
-var express = require('express');
-var bodyParser = require('body-parser');
-var compression = require('compression');
+const http = require('http');
+const path = require('path');
+const url = require('url');
 
-var bundler = require('heya-bundler');
+const debug = require('debug')('heya-io:server');
+const express = require('express');
+const bodyParser = require('body-parser');
+const compression = require('compression');
+
+const bundler = require('heya-bundler');
+
+const io = require('../main');
 
 // The APP
 
-var app = express();
-app.use(compression());
-app.use(bodyParser.raw({type: '*/*'}));
+const app = express();
+// app.use(compression());
+// app.use(bodyParser.raw({type: '*/*'}));
 
-var counter = 0;
+const compressionMiddleware = compression();
+app.use((req, res, next) => {
+	if (req.path === '/redirect') {
+		return next();
+	}
+	return compressionMiddleware(req, res, next);
+});
 
-var alphabet = 'abcdefghijklmnopqrstuvwxyz';
+const bodyParserMiddleware = bodyParser.raw({type: '*/*'});
+app.use((req, res, next) => {
+	if (req.path === '/redirect') {
+		return next();
+	}
+	return bodyParserMiddleware(req, res, next);
+});
+
+let counter = 0;
+
+const alphabet = 'abcdefghijklmnopqrstuvwxyz';
 
 app.get('/alpha', function(req, res) {
 	var n;
@@ -45,6 +65,33 @@ app.post('/alpha', function(req, res) {
 		}
 	}
 	res.jsonp({n: n, verified: verified});
+});
+
+const doNotSet = {'content-encoding': 1, 'content-length': 1, etag: 1, connection: 1, 'transfer-encoding': 1}
+
+app.all('/redirect', (req, res) => {
+	const urlTo = new url.URL(req.query.to, 'http://localhost:3000/');
+	io({
+		method: req.method,
+		url: urlTo.href,
+		headers: req.headers,
+		responseType: '$tream',
+		returnXHR: true,
+		query: {},
+		data: req
+	}).then(xhr => {
+		res.status(xhr.status);
+		const headers = io.getHeaders(xhr);
+		Object.keys(headers).forEach(key => {
+			const value = headers[key];
+			if (value instanceof Array) {
+				value.forEach(v => res.set(key, v));
+			} else {
+				!doNotSet[key] && res.set(key, value);
+			}
+		});
+		xhr.response.pipe(res);
+	}).catch(e => console.error(e));
 });
 
 app.all('/api', function(req, res) {
@@ -102,11 +149,7 @@ app.put(
 );
 
 function isUrlAcceptable(uri) {
-	return (
-		typeof uri == 'string' &&
-		!/^\/\//.test(uri) &&
-		(uri.charAt(0) === '/' || /^http:\/\/localhost:3000\//.test(uri))
-	);
+	return typeof uri == 'string' && !/^\/\//.test(uri) && (uri.charAt(0) === '/' || /^http:\/\/localhost:3000\//.test(uri));
 }
 
 function resolveUrl(uri) {

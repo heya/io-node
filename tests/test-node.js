@@ -27,7 +27,6 @@ unit.add(module, [
 		});
 	},
 	function test_node_fromStream (t) {
-		if (!PassThrough) return;
 		const x = t.startAsync(), dataStream = new PassThrough();
 		io.post({
 			url: 'http://localhost:3000/api',
@@ -42,7 +41,6 @@ unit.add(module, [
 		dataStream.end(JSON.stringify({a: 1}));
 	},
 	function test_node_forceCompression (t) {
-		if (!PassThrough) return;
 		const x = t.startAsync(), dataStream = new PassThrough();
 		io.post({
 			url: 'http://localhost:3000/alpha',
@@ -71,5 +69,20 @@ unit.add(module, [
 			eval(t.TEST('data.body === "{\\"a\\":1}"'));
 			x.done();
 		});
+	},
+	function test_node_redirect (t) {
+		const x = t.startAsync(), dataStream = new PassThrough();
+		io.post({
+			url: 'http://localhost:3000/redirect?to=/api',
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		}, dataStream).then(data => {
+			console.log(data);
+			eval(t.TEST('data.method === "POST"'));
+			eval(t.TEST('data.body === "{\\"a\\":1}"'));
+			x.done();
+		});
+		dataStream.end(JSON.stringify({a: 1}));
 	}
 ]);

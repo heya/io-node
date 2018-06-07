@@ -1,6 +1,7 @@
 'use strict';
 
 const {Readable} = require('stream');
+const {IncomingMessage} = require('http');
 
 const io = require('./node');
 
@@ -39,6 +40,6 @@ io.node.attach();
 
 const passThrough = (_1, _2, data) => new io.Ignore(data);
 
-io.dataProcessors.push(Readable, passThrough, Buffer, passThrough);
+io.dataProcessors.push(Readable, passThrough, Buffer, passThrough, IncomingMessage, passThrough);
 
 module.exports = io;

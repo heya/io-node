@@ -85,6 +85,13 @@ const requestTransport = (options, prep) => {
 		if (opt.body instanceof Readable) {
 			const stream = req.getHeader('content-type') && req.getHeader('content-encoding') ? returnInputStream(req, opt) : req;
 			opt.body.pipe(stream);
+		} else if (opt.body instanceof http.IncomingMessage) {
+			const rawHeaders = opt.body.rawHeaders;
+			for (let i = 0; i < rawHeaders.length; i += 2) {
+				req.setHeader(rawHeaders[i], rawHeaders[i + 1]);
+			}
+			const stream = req.getHeader('content-type') && req.getHeader('content-encoding') ? returnInputStream(req, opt) : req;
+			opt.body.pipe(stream);
 		} else {
 			const stream =
 				opt.body &&
