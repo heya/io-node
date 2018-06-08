@@ -78,7 +78,7 @@ unit.add(module, [
 				'Content-Type': 'application/json'
 			}
 		}, dataStream).then(data => {
-			console.log(data);
+			// console.log(data);
 			eval(t.TEST('data.method === "POST"'));
 			eval(t.TEST('data.body === "{\\"a\\":1}"'));
 			x.done();
