@@ -36,8 +36,6 @@ const returnInputStream = (req, options) => {
 	return stream;
 };
 
-const isJson = /^application\/json\b/;
-
 const requestTransport = (options, prep) => {
 	// create request options
 	const urlObject = url.parse(prep.url);
