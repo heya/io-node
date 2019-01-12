@@ -152,6 +152,7 @@ The server runs indefinitely, and can be stopped by Ctrl+C.
 
 # Versions
 
+- 1.1.4 &mdash; *Updated dependencies.*
 - 1.1.3 &mdash; *Added experimental `IncomeMessage` support.*
 - 1.1.2 &mdash; *Exposed `getData()` and `getHeaders()` on stream and error objects.*
 - 1.1.1 &mdash; *Added support for `Buffer`, replaced failure objects with `Error`-based objects.*
