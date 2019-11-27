@@ -1,11 +1,12 @@
 # `io-node`
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/heya/io-node.svg)](https://greenkeeper.io/)
 
 [![Build status][travis-image]][travis-url]
+[![NPM version][npm-image]][npm-url]
+
+[![Greenkeeper][greenkeeper-image]][greenkeeper-url]
 [![Dependencies][deps-image]][deps-url]
 [![devDependencies][dev-deps-image]][dev-deps-url]
-[![NPM version][npm-image]][npm-url]
 
 This is a Node-specific transport for [heya-io](https://github.com/heya/io) based on built-in `http` and `https` modules. The main purpose of the module is to provide an ergonomic simple light-weight HTTP I/O on Node leveraging existing customization facilities of `heya-io` where appropriate.
 
@@ -178,3 +179,5 @@ BSD or AFL &mdash; your choice.
 [dev-deps-url]:   https://david-dm.org/heya/io-node?type=dev
 [travis-image]:   https://img.shields.io/travis/heya/io-node.svg
 [travis-url]:     https://travis-ci.org/heya/io-node
+[greenkeeper-image]: https://badges.greenkeeper.io/heya/io.svg
+[greenkeeper-url]:   https://greenkeeper.io/
