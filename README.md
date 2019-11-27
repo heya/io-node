@@ -152,6 +152,7 @@ The server runs indefinitely, and can be stopped by Ctrl+C.
 
 # Versions
 
+- 1.1.5 &mdash; *Updated dependencies and added a test suite for `io.retry`.*
 - 1.1.4 &mdash; *Updated dependencies.*
 - 1.1.3 &mdash; *Added experimental `IncomeMessage` support.*
 - 1.1.2 &mdash; *Exposed `getData()` and `getHeaders()` on stream and error objects.*
