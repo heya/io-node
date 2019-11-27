@@ -200,4 +200,12 @@ io.node = {
 
 updateEncodingSettings();
 
+if (zlib.createBrotliCompress && zlib.createBrotliDecompress) {
+	io.node.addEncoder('br', {
+		priority: 30,
+		encode: options => zlib.createBrotliCompress(options && options.compressor),
+		decode: options => zlib.createBrotliDecompress(options && options.decompressor)
+	});
+}
+
 module.exports = io;
