@@ -12,15 +12,17 @@ This is a Node-specific transport for [heya-io](https://github.com/heya/io) base
 
 Following `heya-io` services are supported as is out of the box:
 
-* `io.track` &mdash; a simple plugin to track I/O requests to eliminate duplicates, register an interest without initiating I/O requests, and much more.
-* `io.mock` &mdash; a way to mock I/O requests without writing a special server courtesy of [Mike Wilcox](https://github.com/clubajax). Very useful for rapid prototyping and writing tests.
-* `io.bust` &mdash; a simple plugin to generate a randomized query value to bust cache.
+* `io.track` &mdash; tracks I/O requests to eliminate duplicates, register an interest without initiating I/O requests, and much more.
+* `io.mock` &mdash; mocks responses to I/O requests without writing a special server courtesy of [Mike Wilcox](https://github.com/clubajax). Very useful for rapid prototyping and writing tests.
+* `io.bust` &mdash; a simple pseudo plugin to generate a randomized query value to bust cache.
+* `io.retry` &mdash; a flexible way to retry requests, e.g., to deal with unreliable servers or to watch for changing values.
 
 Additionally it supports:
 
 * Completely transparent compression/decompression.
   * `gzip` and `deflate` are supported out of the box with no extra dependencies using built-in modules.
   * More compressions, like [brotli](https://en.wikipedia.org/wiki/Brotli) can be easily plugged in.
+    * `brotli` is automatically supported if an underlying Node has it.
   * The compression is supported **both ways**.
 * Streaming.
   * Both streaming a server request and a server response are supported.
