@@ -8,6 +8,7 @@
 [![Dependencies][deps-image]][deps-url]
 [![devDependencies][dev-deps-image]][dev-deps-url]
 
+
 This is a Node-specific transport for [heya-io](https://github.com/heya/io) based on built-in `http` and `https` modules. The main purpose of the module is to provide an ergonomic simple light-weight HTTP I/O on Node leveraging existing customization facilities of `heya-io` where appropriate.
 
 Following `heya-io` services are supported as is out of the box:
@@ -21,8 +22,8 @@ Additionally it supports:
 
 * Completely transparent compression/decompression.
   * `gzip` and `deflate` are supported out of the box with no extra dependencies using built-in modules.
-  * More compressions, like [brotli](https://en.wikipedia.org/wiki/Brotli) can be easily plugged in.
-    * `brotli` is automatically supported if an underlying Node has it.
+  * More compressions can be easily plugged in.
+    * [brotli](https://en.wikipedia.org/wiki/Brotli) is automatically supported if an underlying Node has it.
   * The compression is supported **both ways**.
 * Streaming.
   * Both streaming a server request and a server response are supported.
@@ -38,7 +39,7 @@ io.get('http://example.com/hello').then(function (value) {
   console.log(value);
 });
 
-io.get('/hello', {to: 'world', times: 5}).then(function (value) {
+io.get('/hello', {to: 'world', times: 5}).then(value => {
   // GET /hello?to=world&times=5
   console.log(value);
 });
@@ -55,7 +56,7 @@ io.patch('/things/7', {age: 14}).then(done);
 io.remove('/things/3').then(done);
 ```
 
-Streaming (since 1.1.0):
+Streaming (since 1.1.0) + encoding a payload (since 1.2.0):
 
 ```js
 const ios = require('heya-io-node/stream');
@@ -64,7 +65,7 @@ fs.createReadStream('sample.json')
     url: 'https://example.com/analyze',
     headers: {
       'Content-Type': 'application/json',
-      'Content-Encoding': 'gzip',
+      '$-Content-Encoding': 'gzip',
       'Accept: plain/text'
     }
   }))
@@ -76,37 +77,33 @@ io.post({
   url: 'https://example.com/analyze',
   headers: {
     'Content-Type': 'application/json',
-    'Content-Encoding': 'gzip',
+    '$-Content-Encoding': 'gzip',
     'Accept: plain/text'
   },
   responseType: '$tream'
 }, fs.createReadStream('sample.json'))
-  .then(res => res.pipe(process.stdout));
+.then(res => res.pipe(process.stdout));
 ```
 
 Mock in action:
 
 ```js
 // set up a mock handler
-io.mock('/a*', function (options, prep) {
+io.mock('/a*', (options, prep) => {
   console.log('Got call: ' + options.method + ' ' + prep.url);
   return 42;
 });
 
 // let's make a call
-io.get('/a/x').then(function (value) {
+io.get('/a/x').then(value => {
   console.log(value); // 42
 });
 
 // set up a redirect /b => /a/b
-io.mock('/b', function (options) {
-  return io.get('/a/b', options.query || options.data || null);
-});
+io.mock('/b', options => io.get('/a/b', options.query || options.data || null));
 
 // let's make another call
-io.get('/b', {q: 1}).then(function (value) {
-  console.log(value); // 42
-});
+io.get('/b', {q: 1}).then(value => console.log(value)); // 42
 ```
 
 Using `url` template to sanitize URLs (ES6):
@@ -115,7 +112,7 @@ Using `url` template to sanitize URLs (ES6):
 const url = require('heya-io/url');
 
 const client = 'Bob & Jordan & Co';
-io.get(url`/api/${client}/details`).then(function (value) {
+io.get(url`/api/${client}/details`).then(value => {
   // GET /api/Bob%20%26%20Jordan%20%26%20Co/details
   console.log(value);
 });
@@ -125,8 +122,10 @@ See more examples in [heya-io's Wiki](https://github.com/heya/io/wiki/), [heya-i
 
 * [Cookbook: main](https://github.com/heya/io/wiki/Cookbook:-main)
 * Services:
+  * [Cookbook: bust](https://github.com/heya/io/wiki/Cookbook:-bust)
   * [Cookbook: mock](https://github.com/heya/io/wiki/Cookbook:-mock)
   * [Cookbook: track](https://github.com/heya/io/wiki/Cookbook:-track)
+  * [Cookbook: retry](https://github.com/heya/io/wiki/Cookbook:-retry)
 
 # How to install
 
@@ -157,17 +156,18 @@ The server runs indefinitely, and can be stopped by Ctrl+C.
 
 # Versions
 
-- 1.1.6 &mdash; *Technical release: added Greenkeeper and removed `yarn.lock`.*
-- 1.1.5 &mdash; *Updated dependencies and added a test suite for `io.retry`.*
-- 1.1.4 &mdash; *Updated dependencies.*
-- 1.1.3 &mdash; *Added experimental `IncomeMessage` support.*
-- 1.1.2 &mdash; *Exposed `getData()` and `getHeaders()` on stream and error objects.*
-- 1.1.1 &mdash; *Added support for `Buffer`, replaced failure objects with `Error`-based objects.*
-- 1.1.0 &mdash; *Getting rid of `request`, use native `http`/`https`, support compression and streaming.*
-- 1.0.3 &mdash; *Bugfix: custom headers. Thx [Bryan Pease](https://github.com/Akeron972)!*
-- 1.0.2 &mdash; *Added custom body processors.*
-- 1.0.1 &mdash; *New dependencies.*
-- 1.0.0 &mdash; *The initial release.*
+- 1.2.0 *Major release: HTTP/2 support, builtin `br` compression, compressing payload.*
+- 1.1.6 *Technical release: added Greenkeeper and removed `yarn.lock`.*
+- 1.1.5 *Updated dependencies and added a test suite for `io.retry`.*
+- 1.1.4 *Updated dependencies.*
+- 1.1.3 *Added experimental `IncomeMessage` support.*
+- 1.1.2 *Exposed `getData()` and `getHeaders()` on stream and error objects.*
+- 1.1.1 *Added support for `Buffer`, replaced failure objects with `Error`-based objects.*
+- 1.1.0 *Getting rid of `request`, use native `http`/`https`, support compression and streaming.*
+- 1.0.3 *Bugfix: custom headers. Thx [Bryan Pease](https://github.com/Akeron972)!*
+- 1.0.2 *Added custom body processors.*
+- 1.0.1 *New dependencies.*
+- 1.0.0 *The initial release.*
 
 # License
 
