@@ -3,6 +3,7 @@
 const url = require('url');
 const http = require('http');
 const https = require('https');
+// const http2 = require('http2');
 const zlib = require('zlib');
 const {Readable} = require('stream');
 
@@ -26,12 +27,12 @@ const returnOutputStream = (res, options) => {
 };
 
 const returnInputStream = (req, options) => {
-	let encoding = req.getHeader('content-encoding');
-	if (!encoding) {
-		encoding = io.node.preferredEncoding;
-		req.setHeader('content-encoding', encoding);
-	}
-	const stream = io.node.encoders[encoding].encode(options).pipe(req);
+	let encoding = req.getHeader('$-content-encoding');
+	req.removeHeader('$-content-encoding');
+	const encoder = io.node.encoders[encoding];
+	if (!encoder) return req;
+	req.setHeader('content-encoding', encoding);
+	const stream = encoder.encode(options).pipe(req);
 	if (stream === req) req.removeHeader('content-encoding');
 	return stream;
 };
@@ -81,20 +82,20 @@ const requestTransport = (options, prep) => {
 		const req = proto.request(opt, res => resolve(res));
 		req.on('error', e => reject(e));
 		if (opt.body instanceof Readable) {
-			const stream = req.getHeader('content-type') && req.getHeader('content-encoding') ? returnInputStream(req, opt) : req;
+			const stream = req.getHeader('content-type') && req.getHeader('$-content-encoding') ? returnInputStream(req, opt) : req;
 			opt.body.pipe(stream);
 		} else if (opt.body instanceof http.IncomingMessage) {
 			const rawHeaders = opt.body.rawHeaders;
 			for (let i = 0; i < rawHeaders.length; i += 2) {
 				req.setHeader(rawHeaders[i], rawHeaders[i + 1]);
 			}
-			const stream = req.getHeader('content-type') && req.getHeader('content-encoding') ? returnInputStream(req, opt) : req;
+			const stream = req.getHeader('content-type') && req.getHeader('$-content-encoding') ? returnInputStream(req, opt) : req;
 			opt.body.pipe(stream);
 		} else {
 			const stream =
 				opt.body &&
 				req.getHeader('content-type') &&
-				((io.node.encodingThreshold && opt.body.length > io.node.encodingThreshold) || req.getHeader('content-encoding'))
+				((io.node.encodingThreshold && opt.body.length > io.node.encodingThreshold) || req.getHeader('$-content-encoding'))
 					? returnInputStream(req, opt)
 					: req;
 			stream.end(opt.body);
@@ -117,15 +118,16 @@ const requestTransport = (options, prep) => {
 				let buffer = null;
 				dataStream.on('data', chunk => (buffer === null ? (buffer = chunk) : (buffer += chunk)));
 				dataStream.on('end', () => resolve(buffer));
-			}).then(buffer => {
-				return new FauxXHR({
-					status: res.statusCode,
-					statusText: res.statusMessage,
-					headers: makeHeaders(res.rawHeaders, options.mime),
-					responseType: options.responseType || '',
-					responseText: buffer ? buffer.toString() : ''
-				});
-			});
+			}).then(
+				buffer =>
+					new FauxXHR({
+						status: res.statusCode,
+						statusText: res.statusMessage,
+						headers: makeHeaders(res.rawHeaders, options.mime),
+						responseType: options.responseType || '',
+						responseText: buffer ? buffer.toString() : ''
+					})
+			);
 		})
 		.then(xhr => io.node.inspectResult(new io.Result(xhr, options)));
 };

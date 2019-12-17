@@ -53,7 +53,7 @@ unit.add(module, [
 			url: 'http://localhost:3000/alpha',
 			headers: {
 				'Content-Type': 'plain/text',
-				'Content-Encoding': 'gzip'
+				'$-Content-Encoding': 'gzip'
 			}
 		}, rep(alphabet, 100)).then(data => {
 			eval(t.TEST('data.n === 2600'));

@@ -116,7 +116,7 @@ unit.add(module, [
 					url: 'http://localhost:3000/api',
 					headers: {
 						'Content-Type': 'application/json',
-						'Content-Encoding': 'deflate'
+						'$-Content-Encoding': 'deflate'
 					}
 				})
 			)
