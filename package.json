@@ -35,6 +35,6 @@
     "heya-unit": "^0.3.0"
   },
   "dependencies": {
-    "heya-io": "^1.9.2"
+    "heya-io": "^1.9.3"
   }
 }
