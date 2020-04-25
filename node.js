@@ -107,7 +107,7 @@ const requestTransport = (options, prep) => {
 					status: res.statusCode,
 					statusText: res.statusMessage,
 					headers: makeHeaders(res.rawHeaders, options.mime),
-					responseType: options.responseType || '',
+					responseType: options.responseType,
 					responseText: ''
 				});
 				xhr.response = returnOutputStream(res, options);
