@@ -156,7 +156,7 @@ The server runs indefinitely, and can be stopped by Ctrl+C.
 
 # Versions
 
-- 1.2.0 *Major release: HTTP/2 support, builtin `br` compression, compressing payload.*
+- 1.1.7 *Technical release: updated dependencies.*
 - 1.1.6 *Technical release: added Greenkeeper and removed `yarn.lock`.*
 - 1.1.5 *Updated dependencies and added a test suite for `io.retry`.*
 - 1.1.4 *Updated dependencies.*
