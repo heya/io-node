@@ -115,8 +115,8 @@ const requestTransport = (options, prep) => {
 			}
 			return new Promise(resolve => {
 				const dataStream = returnOutputStream(res, options);
-				let buffer = null;
-				dataStream.on('data', chunk => (buffer === null ? (buffer = chunk) : (buffer += chunk)));
+				let buffer = Buffer.alloc(0);
+				dataStream.on('data', chunk => (buffer = Buffer.concat([buffer, chunk])));
 				dataStream.on('end', () => resolve(buffer));
 			}).then(
 				buffer =>
@@ -125,7 +125,7 @@ const requestTransport = (options, prep) => {
 						statusText: res.statusMessage,
 						headers: makeHeaders(res.rawHeaders, options.mime),
 						responseType: options.responseType || '',
-						responseText: buffer ? buffer.toString() : ''
+						responseText: buffer.toString()
 					})
 			);
 		})
