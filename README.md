@@ -156,6 +156,7 @@ The server runs indefinitely, and can be stopped by Ctrl+C.
 
 # Versions
 
+- 1.2.0 *Fixed a bug with large UTF-8 documents, updated dependencies.*
 - 1.1.7 *Technical release: updated dependencies.*
 - 1.1.6 *Technical release: added Greenkeeper and removed `yarn.lock`.*
 - 1.1.5 *Updated dependencies and added a test suite for `io.retry`.*
