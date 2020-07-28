@@ -9,6 +9,7 @@ require('./test-url');
 require('./test-compression');
 require('./test-node');
 require('./test-stream');
+require('./test-utf8');
 
 var unit = require('heya-unit');
 

@@ -15,6 +15,17 @@ const io = require('../main');
 
 // The APP
 
+const rep = (s, n) => {
+	if (n <= 0) return '';
+	let result = '';
+	for (let mask = 1, buffer = s; n; mask <<= 1, buffer += buffer) {
+		if (!(n & mask)) continue;
+		result += buffer;
+		n -= mask;
+	}
+	return result;
+};
+
 const app = express();
 // app.use(compression());
 // app.use(bodyParser.raw({type: '*/*'}));
@@ -39,7 +50,7 @@ let counter = 0;
 
 const alphabet = 'abcdefghijklmnopqrstuvwxyz';
 
-app.get('/alpha', function(req, res) {
+app.get('/alpha', function (req, res) {
 	var n;
 	if (req.query.n) {
 		n = +req.query.n;
@@ -54,7 +65,7 @@ app.get('/alpha', function(req, res) {
 	}
 	res.end();
 });
-app.post('/alpha', function(req, res) {
+app.post('/alpha', function (req, res) {
 	var body = req.body.toString(),
 		n = body.length,
 		verified = true;
@@ -67,7 +78,7 @@ app.post('/alpha', function(req, res) {
 	res.jsonp({n: n, verified: verified});
 });
 
-const doNotSet = {'content-encoding': 1, 'content-length': 1, etag: 1, connection: 1, 'transfer-encoding': 1}
+const doNotSet = {'content-encoding': 1, 'content-length': 1, etag: 1, connection: 1, 'transfer-encoding': 1};
 
 app.all('/redirect', (req, res) => {
 	const urlTo = new url.URL(req.query.to, 'http://localhost:3000/');
@@ -79,22 +90,24 @@ app.all('/redirect', (req, res) => {
 		returnXHR: true,
 		query: {},
 		data: req
-	}).then(xhr => {
-		res.status(xhr.status);
-		const headers = io.getHeaders(xhr);
-		Object.keys(headers).forEach(key => {
-			const value = headers[key];
-			if (value instanceof Array) {
-				value.forEach(v => res.set(key, v));
-			} else {
-				!doNotSet[key] && res.set(key, value);
-			}
-		});
-		xhr.response.pipe(res);
-	}).catch(e => console.error(e));
+	})
+		.then(xhr => {
+			res.status(xhr.status);
+			const headers = io.getHeaders(xhr);
+			Object.keys(headers).forEach(key => {
+				const value = headers[key];
+				if (value instanceof Array) {
+					value.forEach(v => res.set(key, v));
+				} else {
+					!doNotSet[key] && res.set(key, value);
+				}
+			});
+			xhr.response.pipe(res);
+		})
+		.catch(e => console.error(e));
 });
 
-app.all('/api', function(req, res) {
+app.all('/api', function (req, res) {
 	if (req.query.status) {
 		var status = parseInt(req.query.status, 10);
 		if (isNaN(status) || status < 100 || status >= 600) {
@@ -111,6 +124,12 @@ app.all('/api', function(req, res) {
 			res.set('Content-Type', 'application/xml');
 			res.send('<div>Hello, world!</div>');
 			return;
+	}
+	if (req.query.pattern && /^\d+$/.test(req.query.repeat)) {
+		res.set('Content-Type', 'text/plain; charset=utf-8');
+		const data = rep(req.query.pattern, +req.query.repeat);
+		res.send(data);
+		return;
 	}
 	var data = {
 		method: req.method,
@@ -132,7 +151,7 @@ app.all('/api', function(req, res) {
 		}
 	}
 	if (timeout) {
-		setTimeout(function() {
+		setTimeout(function () {
 			res.jsonp(data);
 		}, timeout);
 	} else {
@@ -159,7 +178,7 @@ function resolveUrl(uri) {
 app.use(express.static(path.join(__dirname, '..')));
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
 	var err = new Error('Not Found');
 	err.status = 404;
 	next(err);
@@ -167,7 +186,7 @@ app.use(function(req, res, next) {
 
 // error handlers
 
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
 	// for simplicity we don't use fancy HTML formatting opting for a plain text
 	res.status(err.status || 500);
 	res.set('Content-Type', 'text/plain');
