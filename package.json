@@ -36,5 +36,9 @@
   },
   "dependencies": {
     "heya-io": "^1.9.3"
-  }
+  },
+  "files": [
+    "/*.js",
+    "/utils"
+  ]
 }
