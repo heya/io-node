@@ -1,6 +1,5 @@
 'use strict';
 
-const url = require('url');
 const http = require('http');
 const https = require('https');
 // const http2 = require('http2');
@@ -41,13 +40,13 @@ const returnInputStream = (req, options) => {
 
 const requestTransport = (options, prep) => {
   // create request options
-  const urlObject = url.parse(prep.url);
+  const urlObject = new URL(prep.url);
   const newOptions = {
     url: prep.url,
     protocol: urlObject.protocol,
     hostname: urlObject.hostname,
     port: urlObject.port,
-    path: urlObject.path,
+    path: urlObject.pathname + urlObject.search + urlObject.hash,
     method: options.method,
     headers: Object.assign({}, options.headers)
   };

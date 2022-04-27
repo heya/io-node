@@ -156,6 +156,7 @@ The server runs indefinitely, and can be stopped by Ctrl+C.
 
 # Versions
 
+- 1.3.0 *Replaced obsolete `url` module with WHATWG URL.*
 - 1.2.0 *Fixed a bug with large UTF-8 documents, updated dependencies.*
 - 1.1.7 *Technical release: updated dependencies.*
 - 1.1.6 *Technical release: added Greenkeeper and removed `yarn.lock`.*
